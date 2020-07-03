@@ -21,7 +21,12 @@
 			return await this.userManager.CreateAsync(user, password);
 		}
 
-		public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword)
+        {
+			return await this.userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+		}
+
+        public async Task<User> GetUserByEmailAsync(string email)
 		{
 			return await this.userManager.FindByEmailAsync(email);
 		}
@@ -35,10 +40,23 @@
 				false);
 		}
 
-
 		public async Task LogoutAsync()
         {
 			await this.signInManager.SignOutAsync();
 		}
-    }
+
+        public async Task<IdentityResult> UpdateUserAsync(User user)
+        {
+            return await this.userManager.UpdateAsync(user);
+        }
+
+        public async Task<SignInResult> ValidatePasswordAsync(User user, string password)
+        {
+			return await this.signInManager.CheckPasswordSignInAsync(
+				user,
+				password,
+				false);
+
+		}
+	}
 }
