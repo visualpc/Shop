@@ -1,6 +1,7 @@
 ﻿namespace Shop.Web.Data
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Entities;
@@ -33,9 +34,25 @@
             //    await this.AddCountriesAndCitiesAsync();
             //}
 
+            if (!this.context.Countries.Any())
+            {
+                var cities = new List<City>();
+                cities.Add(new City { Name = "Medellín" });
+                cities.Add(new City { Name = "Bogotá" });
+                cities.Add(new City { Name = "Cali" });
+
+                this.context.Countries.Add(new Country
+                {
+                    Cities = cities,
+                    Name = "Colombia"
+                });
+                await this.context.SaveChangesAsync();
+            }
+
+
             //await this.CheckUser("brad@gmail.com", "Brad", "Pit", "Customer");
             //await this.CheckUser("angelina@gmail.com", "Angelina", "Jolie", "Customer");
-            //var user = await this.CheckUser("jzuluaga55@gmail.com", "Juan", "Zuluaga", "Admin");
+            //var user = await this.CheckUser("pablocuelloc@gmail.com", "Pablo", "Cuello", "Admin");
 
             // Add products
 
@@ -48,7 +65,10 @@
                     LastName = "Cuello",
                     Email = "pablocuelloc@gmail.com",
                     UserName = "pablocuelloc@gmail.com",
-                    PhoneNumber ="3206832089"
+                    PhoneNumber ="3206832089",
+                    Address = "Calle Luna Calle Sol",
+                    CityId = this.context.Countries.FirstOrDefault().Cities.FirstOrDefault().Id,
+                    City = this.context.Countries.FirstOrDefault().Cities.FirstOrDefault()
                 };
 
                 var result = await this.userHelper.AddUserAsync(user, "123456");
@@ -58,7 +78,9 @@
                 }
 
                 await this.userHelper.AddUserToRoleAsync(user, "Admin");
-
+                //Se genera y usa token confirmar usuario Admin
+                var token = await this.userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await this.userHelper.ConfirmEmailAsync(user, token);
             }
 
             var isInRole = await this.userHelper.IsUserInRoleAsync(user, "Admin");
